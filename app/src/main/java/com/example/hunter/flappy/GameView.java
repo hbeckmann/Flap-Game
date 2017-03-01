@@ -38,7 +38,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private SurfaceHolder surfaceHolder;
     private Background background;
     private Boolean readyToDraw;
-    private MediaPlayer mPlayer;
+    private MediaPlayer mediaPlayer;
     private Context currentContext;
     private boolean firstFrame;
 
@@ -57,10 +57,14 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         readyToDraw = false;
         vHeight = viewHeight;
         vWidth = viewWidth;
-        mPlayer = MediaPlayer.create(context, R.raw.jump2);
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mPlayer.setVolume(1f, 1f);
-
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
+        //Won't work without the while loop - P R O G R A M M I N G
+        while (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
+        }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setVolume(1f, 1f);
 
 
     }
@@ -188,8 +192,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         playing = false;
         player.releaseSprites();
         pipe.recycleBitmaps();
-        mPlayer.release();
-        mPlayer = null;
+       if(mediaPlayer != null) {
+           mediaPlayer.stop();
+           mediaPlayer.release();
+           mediaPlayer = null;
+       }
+
     }
 
     public void resume() {
@@ -197,11 +205,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         //start thread
         playing = true;
         firstFrame = true;
-        if (mPlayer == null) {
-            mPlayer = MediaPlayer.create(currentContext, R.raw.jump2);
-            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mPlayer.setVolume(1f, 1f);
-        }
 
         gameThread = new Thread(this);
         gameThread.start();
@@ -215,8 +218,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             //Player is jumping
             player.setVelocity((vHeight / jumpScale));
             player.animateJump();
-            mPlayer.seekTo(0);
-            mPlayer.start();
+            if(mediaPlayer != null) {
+                mediaPlayer.seekTo(0);
+                mediaPlayer.start();
+            }
+
         }
 
         if(!playing && firstFrame && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
