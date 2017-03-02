@@ -59,14 +59,18 @@ public class Background {
 
     public void scrollBackground() {
 
-        if(backgroundX + background.getWidth() * 2 - vWidth <= 0) {
+        try {
+            if(backgroundX + background.getWidth() * 2 - vWidth <= 0) {
 
-            backgroundX = backgroundX + background.getWidth() * 2;
+                backgroundX = backgroundX + background.getWidth() * 2;
 
-        } else if(reversebackgroundX + background.getWidth() * 2 - vWidth <= 0) {
+            } else if(reversebackgroundX + background.getWidth() * 2 - vWidth <= 0) {
 
-            reversebackgroundX = reversebackgroundX + background.getWidth() * 2;
+                reversebackgroundX = reversebackgroundX + background.getWidth() * 2;
 
+            }
+        } catch (Exception e) {
+            System.out.println(e.getCause());
         }
 
         backgroundX -= scrollSpeed;

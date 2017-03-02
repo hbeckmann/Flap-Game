@@ -34,6 +34,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Player player;
     private Pipe pipe;
 
+    private final static int FPS = 1000 / 60;
+    private long beginTime;
+    private int framesSkipped;
+    private long timeDiff;
+    private int sleepTime;
+
     private Paint paint;
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
@@ -69,36 +75,43 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
 
     }
-//
-//    public class MyCallback implements SurfaceHolder.Callback {
-//
-//        public void surfaceChanged(SurfaceHolder holder, int format,
-//                                   int width, int height) {
-//        }
-//
-//        @Override
-//        public void surfaceCreated(SurfaceHolder holder) {
-//            // you need to start your drawing thread here
-//            System.out.println("surface created!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//            readyToDraw = true;
-//
-//        }
-//
-//        @Override
-//        public void surfaceDestroyed(SurfaceHolder holder) {
-//            // and here you need to stop it
-//        }
-//    }
 
     @Override
     public void run() {
+        System.out.println("beginning to run!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         while (playing) {
-            //update frame
-            update();
-            //draw frame
-            draw();
-            //control
-            control();
+            beginTime = System.currentTimeMillis();
+            framesSkipped = 0;
+
+            synchronized (surfaceHolder) {
+
+                update();
+                //draw frame
+                draw();
+                //control
+                control();
+
+                timeDiff = System.currentTimeMillis() - beginTime;
+
+                sleepTime = (int) (FPS - timeDiff);
+                //System.out.println(sleepTime);
+
+                if(sleepTime > 0) {
+                    try {
+                        gameThread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        System.out.println(e.getCause());
+                    }
+
+                }
+
+//                while(sleepTime < 0 && framesSkipped < 5) {
+//                    //catch up without a draw
+//                    update();
+//                    sleepTime += FPS;
+//                    framesSkipped++;
+//                }
+            }
 
         }
 
@@ -121,49 +134,54 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             canvas = surfaceHolder.lockCanvas();
             //drawing a background color on canvas
             canvas.drawColor(Color.WHITE);
-            if(background.getBackgroundBitmap() != null) {
+            try {
+                if(background.getBackgroundBitmap() != null) {
 
+                    canvas.drawBitmap(
+                            background.getBackgroundBitmap(),
+                            background.getBackgroundX(),
+                            0,
+                            paint
+                    );
+
+                }
+
+                if(background.getReverseBackground() != null) {
+
+                    canvas.drawBitmap(
+                            background.getReverseBackground(),
+                            background.getReversebackgroundX(),
+                            0,
+                            paint
+                    );
+
+                }
+
+                //draw the player
                 canvas.drawBitmap(
-                        background.getBackgroundBitmap(),
-                        background.getBackgroundX(),
-                        0,
+                        player.getBitmap(),
+                        player.getX(),
+                        player.getY(),
                         paint
                 );
-
-            }
-
-            if(background.getReverseBackground() != null) {
-
+                //draw the top pipe
                 canvas.drawBitmap(
-                        background.getReverseBackground(),
-                        background.getReversebackgroundX(),
-                        0,
+                        pipe.getAboveBitmap(),
+                        pipe.getX(),
+                        pipe.getAboveY(),
                         paint
                 );
-
+                //bottom pipe
+                canvas.drawBitmap(
+                        pipe.getBelowBitmap(),
+                        pipe.getX(),
+                        pipe.getBelowY(),
+                        paint
+                );
+            } catch (Exception e) {
+                System.out.println(e.getCause());
             }
 
-            //draw the player
-            canvas.drawBitmap(
-                    player.getBitmap(),
-                    player.getX(),
-                    player.getY(),
-                    paint
-            );
-            //draw the top pipe
-            canvas.drawBitmap(
-                    pipe.getAboveBitmap(),
-                    pipe.getX(),
-                    pipe.getAboveY(),
-                    paint
-            );
-            //bottom pipe
-            canvas.drawBitmap(
-                    pipe.getBelowBitmap(),
-                    pipe.getX(),
-                    pipe.getBelowY(),
-                    paint
-            );
             //unlock the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
@@ -175,21 +193,21 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         if(firstFrame && surfaceHolder.getSurface().isValid()) {
             playing = false;
         }
-        try{
-            gameThread.sleep(1000 / 60);
-        } catch(InterruptedException e) {
-
-        }
+//        try{
+//            gameThread.sleep(1);
+//        } catch(InterruptedException e) {
+//
+//        }
     }
 
     public void pause() {
         //when the game is paused
-        try {
-            //stopping thread
-            gameThread.join();
-        } catch(InterruptedException e) {
-
-        }
+//        try {
+//            stopping thread
+//            gameThread.join();
+//        } catch(InterruptedException e) {
+//
+//        }
         playing = false;
         player.releaseSprites();
         pipe.recycleBitmaps();
@@ -208,6 +226,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         playing = true;
         firstFrame = true;
 
+
         gameThread = new Thread(this);
         gameThread.start();
 
@@ -224,6 +243,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 mediaPlayer.seekTo(0);
                 mediaPlayer.start();
             }
+
 
         }
 
