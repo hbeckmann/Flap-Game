@@ -32,6 +32,8 @@ public class Background {
         rawBackground = BitmapFactory.decodeResource(context.getResources(), pictureSource, bitmapLoadingOptions);
         scaledBackgroundWidth = rawBackground.getWidth() * viewHeight / rawBackground.getHeight();
         background = Bitmap.createScaledBitmap(rawBackground, scaledBackgroundWidth, viewHeight, true);
+        rawBackground.recycle();
+        rawBackground = null;
         reversebackgroundX = background.getWidth();
         reverse = new Matrix();
         reverse.preScale(-1, 1);
@@ -41,8 +43,6 @@ public class Background {
     }
 
     public void releaseBitmaps() {
-        rawBackground.recycle();
-        rawBackground = null;
         background.recycle();
         background = null;
         reverseBackground.recycle();

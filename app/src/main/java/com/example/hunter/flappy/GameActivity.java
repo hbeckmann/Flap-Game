@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.LayoutInflater;
+import android.widget.RelativeLayout;
 
 public class GameActivity extends Activity {
 
@@ -73,7 +76,6 @@ public class GameActivity extends Activity {
     @Override
     protected void onStop() {
         System.out.println("------------ EXITING AND DRESTROYING BACKGROUND");
-        gameView.getBackgroundObject().releaseBitmaps();
         if(mPlayer != null && mPlayer.isPlaying()) {
             mPlayer.reset();
             mPlayer.stop();

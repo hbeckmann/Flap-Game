@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
 import android.view.MotionEvent;
@@ -50,7 +51,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
         surfaceHolder = getHolder();
         //surfaceHolder.addCallback(new MyCallback());
-        background = new Background(context, R.drawable.background01, viewWidth, viewHeight);
+        background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         player = new Player(context, viewWidth, viewHeight);
         pipe = new Pipe(context, viewWidth, viewHeight);
         paint = new Paint();
@@ -165,15 +166,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             );
             //unlock the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
-            if(firstFrame) {
-                playing = false;
-            }
         }
 
 
     }
 
     private void control() {
+        if(firstFrame && surfaceHolder.getSurface().isValid()) {
+            playing = false;
+        }
         try{
             gameThread.sleep(1000 / 60);
         } catch(InterruptedException e) {
@@ -192,6 +193,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         playing = false;
         player.releaseSprites();
         pipe.recycleBitmaps();
+        background.releaseBitmaps();
        if(mediaPlayer != null) {
            mediaPlayer.stop();
            mediaPlayer.release();
@@ -216,8 +218,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         if(playing && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
 
             //Player is jumping
-            player.setVelocity((vHeight / jumpScale));
-            player.animateJump();
+           player.setVelocity((vHeight / jumpScale));
+           player.animateJump();
             if(mediaPlayer != null) {
                 mediaPlayer.seekTo(0);
                 mediaPlayer.start();

@@ -34,17 +34,19 @@ public class Player {
     public Player(Context context, int vWidth, int vHeight) {
 
         currentContext = context;
+        BitmapFactory.Options bitmapLoadingOptions = new BitmapFactory.Options();
+        bitmapLoadingOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        height = (vHeight + 168) / heightScale;
+        width = vWidth / widthScale;
         sprites = new Bitmap[] {
-                BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_1),
-                BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_2),
-                BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_3),
-                BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_4),
-                BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_1),
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_1, bitmapLoadingOptions), height, width, true),
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_2, bitmapLoadingOptions), height, width, true),
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_3, bitmapLoadingOptions), height, width, true),
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_4, bitmapLoadingOptions), height, width, true),
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_1, bitmapLoadingOptions), height, width, true)
         };
         this.vWidth = vWidth;
         this.vHeight = vHeight;
-        height = (vHeight + 168) / heightScale;
-        width = vWidth / widthScale;
         velocity = -(vHeight / 100);
         acceleration = -1.02;
         //Update this to be relative to screen

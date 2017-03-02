@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -34,7 +35,7 @@ public class MainView extends SurfaceView implements Runnable {
         this.viewHeight = viewHeight;
 
         surfaceHolder = getHolder();
-        background = new Background(context, R.drawable.background01, viewWidth, viewHeight);
+        background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         background.setScrollSpeed(1);
 
 
@@ -120,7 +121,7 @@ public class MainView extends SurfaceView implements Runnable {
         //start thread
         if(background == null) {
             System.out.println("------------------------------------ reimplementing background");
-            background = new Background(currentContext, R.drawable.background01, viewWidth, viewHeight);
+            background = new Background(currentContext, R.drawable.background01_small, viewWidth, viewHeight);
             background.setScrollSpeed(1);
         }
         viewing = true;
