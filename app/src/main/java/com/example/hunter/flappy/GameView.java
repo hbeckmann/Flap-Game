@@ -288,6 +288,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             firstFrame = false;
         }
 
+
     }
 
 }

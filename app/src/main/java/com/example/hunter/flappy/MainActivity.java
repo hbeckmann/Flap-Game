@@ -29,29 +29,30 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private int viewHeight;
     private int viewWidth;
     private DisplayMetrics displayMetrics;
-    private Intent gameActivity;
     private RelativeLayout menu;
     private FrameLayout mainMenu;
-    private ImageButton playButton;
+    private Thread mainThread;
+    private volatile boolean clicking;
+    private Activity mainActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clicking = false;
 
+        mainActivity = this;
         //Converts the layout xml into view objects
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemInflater = (View) inflater.inflate(R.layout.activity_main, null);
-
         //The frame layout is used to house the Surface View and the Relative view on top
         mainMenu = new FrameLayout(this);
         menu = (RelativeLayout)itemInflater.findViewById(R.id.activity_main);
-
-        gameActivity = new Intent(this, GameActivity.class);
         displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         viewHeight = displayMetrics.heightPixels;
         viewWidth = displayMetrics.widthPixels;
-        mainView = new MainView(this, viewWidth, viewHeight);
+        mainView = new MainView(this, mainActivity, viewWidth, viewHeight);
 
         //uses the layout xml instead of drawing on a surfaceHolder
         //setContentView(R.layout.activity_main);
@@ -64,8 +65,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         mainMenu.addView(menu);
         setContentView(mainMenu);
 
-        playButton = (ImageButton) findViewById(R.id.playButton);
-        playButton.setOnClickListener(this);
 
         if(mPlayer == null) {
             mPlayer = MediaPlayer.create(this, R.raw.roccow_welcome);
@@ -74,16 +73,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
             mPlayer.start();
         }
 
-
-
     }
 
     @Override
     public void onClick(View v) {
 
-        startActivity(gameActivity);
 
     }
+
 
     @Override
     public void onStop() {
@@ -129,6 +126,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
 
     @Override
     public void run() {
+
 
     }
 

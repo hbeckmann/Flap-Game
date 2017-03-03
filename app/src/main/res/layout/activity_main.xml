@@ -21,7 +21,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/play_btn_out"
+        android:src="@drawable/playbtnselector"
         android:id="@+id/playButton"
         android:scaleType="fitCenter"
         android:layout_marginBottom="177dp"
