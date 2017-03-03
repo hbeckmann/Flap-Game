@@ -288,6 +288,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             firstFrame = false;
         }
 
+        if(player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX()
+                && player.getHitBoxX() < pipe.getX() + pipe.getWidth()
+                && (player.getHitBoxY() < pipe.getAboveY() + pipe.getAboveOpening() - pipe.getAboveHitboxLeniency()
+                || player.getHitBoxY() + player.getHitBoxHeight() > pipe.getBelowY() + pipe.getBelowHitboxLeniency())) {
+            System.out.println("Hitbox Y: " + player.getHitBoxY() + "   Pipe Opening is " + pipe.getAboveY() + pipe.getAboveOpening());
+            playing = false;
+            firstFrame = false;
+        }
+
 
     }
 

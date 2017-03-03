@@ -30,6 +30,10 @@ public class Player {
     private boolean jumping;
     private int vHeight;
     private int vWidth;
+    private int hitBoxX;
+    private int hitBoxY;
+    private int hitBoxWidth;
+    private int hitBoxHeight;
 
     public Player(Context context, int vWidth, int vHeight) {
 
@@ -38,6 +42,10 @@ public class Player {
         bitmapLoadingOptions.inPreferredConfig = Bitmap.Config.RGB_565;
         height = (vHeight + 168) / heightScale;
         width = vWidth / widthScale;
+        hitBoxHeight = (height / 5) * 4;
+        hitBoxWidth = (width /5 ) * 4;
+
+
         sprites = new Bitmap[] {
                 Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_1, bitmapLoadingOptions), height, width, true),
                 Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.frame_2, bitmapLoadingOptions), height, width, true),
@@ -52,7 +60,9 @@ public class Player {
         //Update this to be relative to screen
         System.out.println(vWidth + " " + vHeight);
         x =  (vWidth / 2) - (width + 100);
+        hitBoxX = x + ((width - hitBoxWidth) / 2);
         y = (vHeight / 2) - 168;
+        hitBoxY = y + ((height - hitBoxHeight) / 2);
         rawImage = sprites[currentSprite];
         bitmap = Bitmap.createScaledBitmap(rawImage, height, width, true);
         //spriteTimer = new Thread();
@@ -63,6 +73,7 @@ public class Player {
     public void update() {
         velocity += acceleration;
         y -= (int) velocity;
+        hitBoxY = y + ((height - hitBoxHeight) / 2);
         if(jumping) {
             animateJump();
         }
@@ -130,6 +141,22 @@ public class Player {
 
     public void setVelocity(double velocity) {
         this.velocity = velocity;
+    }
+
+    public int getHitBoxX() {
+        return hitBoxX;
+    }
+
+    public int getHitBoxY() {
+        return hitBoxY;
+    }
+
+    public int getHitBoxWidth() {
+        return hitBoxWidth;
+    }
+
+    public int getHitBoxHeight() {
+        return hitBoxHeight;
     }
 
     public void releaseSprites() {

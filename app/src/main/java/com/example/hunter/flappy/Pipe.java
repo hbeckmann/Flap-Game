@@ -27,6 +27,8 @@ public class Pipe {
     private int vHeight;
     private int width;
     private int speed;
+    private int aboveHitboxLeniency;
+    private int belowHitboxLeniency;
     private int x;
     private Random rand;
 
@@ -52,15 +54,17 @@ public class Pipe {
         belowBitmap = Bitmap.createScaledBitmap(rawImage, width, belowOpening, true);
         aboveY = 0;
         belowY = (aboveOpening + (viewHeight - aboveOpening - belowOpening));
-
-
+        aboveHitboxLeniency = (aboveOpening / 10) * 2;
+        belowHitboxLeniency = (belowOpening / 10) * 2;
     }
 
     public void update() {
         if (x <= 0 - width) {
             x = vWidth;
             aboveOpening = randomizeAboveOpening(vHeight);
+            aboveHitboxLeniency = (aboveOpening / 10) * 2;
             belowOpening = randomizeBelowOpening(vHeight);
+            belowHitboxLeniency = (belowOpening / 10) * 2;
             belowY = (aboveOpening + (vHeight - aboveOpening - belowOpening));
             aboveBitmap = Bitmap.createScaledBitmap(reverseRawImage, width, aboveOpening, true);
             belowBitmap = Bitmap.createScaledBitmap(rawImage, width, belowOpening, true);
@@ -130,6 +134,14 @@ public class Pipe {
 
     public int getBelowY() {
         return belowY;
+    }
+
+    public int getAboveHitboxLeniency() {
+        return aboveHitboxLeniency;
+    }
+
+    public int getBelowHitboxLeniency() {
+        return belowHitboxLeniency;
     }
 
     public static Bitmap RotateBitmap(Bitmap source, float angle)
