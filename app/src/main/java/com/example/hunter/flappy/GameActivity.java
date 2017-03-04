@@ -1,14 +1,17 @@
 package com.example.hunter.flappy;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.LayoutInflater;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 public class GameActivity extends Activity {
@@ -18,6 +21,7 @@ public class GameActivity extends Activity {
     private int viewHeight;
     private int viewWidth;
     private MediaPlayer mPlayer;
+
 
 
     @Override
@@ -58,8 +62,10 @@ public class GameActivity extends Activity {
     //running game when activity is resumed
     @Override
     protected void onResume() {
+
         super.onResume();
         gameView.resume();
+
     }
 
     @Override
@@ -85,6 +91,9 @@ public class GameActivity extends Activity {
         super.onStop();
         super.finish();
     }
+
+
+
 
 
 

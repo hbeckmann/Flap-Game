@@ -29,19 +29,14 @@ public class MainView extends SurfaceView implements Runnable {
     private Context currentContext;
     private int viewWidth;
     private int viewHeight;
-    private Handler handler;
-    private ImageButton playButton;
-    private Intent gameActivity;
-    private Activity mainActivity;
+
 
     public MainView(Context context, Activity mainActivity, int viewWidth, int viewHeight) {
 
         super(context);
         currentContext = context;
-        this.mainActivity = mainActivity;
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
-        gameActivity = new Intent(currentContext, GameActivity.class);
         surfaceHolder = getHolder();
         background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         background.setScrollSpeed(1);
@@ -125,26 +120,20 @@ public class MainView extends SurfaceView implements Runnable {
     public void resume() {
         //when the game is resumed
         //start thread
+        System.out.println("hello!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if(background == null) {
             System.out.println("------------------------------------ reimplementing background");
             background = new Background(currentContext, R.drawable.background01_small, viewWidth, viewHeight);
             background.setScrollSpeed(viewWidth / 500);
         }
         viewing = true;
-        playButton = (ImageButton) mainActivity.findViewById(R.id.playButton);
-        playButton.setOnClickListener(playButtonHandler);
+
         menuThread = new Thread(this);
         menuThread.start();
 
     }
 
-    View.OnClickListener playButtonHandler = new View.OnClickListener() {
-        public void onClick(View v) {
 
-            currentContext.startActivity(gameActivity);
-
-        }
-    };
 
 
     public Background getBackgroundObject() {

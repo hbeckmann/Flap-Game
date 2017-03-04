@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
@@ -35,6 +36,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private Thread mainThread;
     private volatile boolean clicking;
     private Activity mainActivity;
+    private Handler handler;
+    private ImageButton playButton;
+    private ImageButton creditsButton;
+    private Intent gameActivity;
+    private Intent creditActivity;
 
 
     @Override
@@ -43,6 +49,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         clicking = false;
 
         mainActivity = this;
+        gameActivity = new Intent(this, GameActivity.class);
+        creditActivity = new Intent(this, CreditActivity.class);
         //Converts the layout xml into view objects
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemInflater = (View) inflater.inflate(R.layout.activity_main, null);
@@ -111,6 +119,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mPlayer.start();
         }
+        playButton = (ImageButton) findViewById(R.id.playButton);
+        playButton.setOnClickListener(playButtonHandler);
+        creditsButton = (ImageButton) findViewById(R.id.creditButton);
+        creditsButton.setOnClickListener(creditButtonHandler);
     }
 
     protected void onPause() {
@@ -131,5 +143,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
 
 
     }
+
+    View.OnClickListener playButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            startActivity(gameActivity);
+
+        }
+    };
+
+    View.OnClickListener creditButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            startActivity(creditActivity);
+
+        }
+    };
 
 }

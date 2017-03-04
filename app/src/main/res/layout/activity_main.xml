@@ -13,6 +13,7 @@
     tools:context="com.example.hunter.flappy.MainActivity"
     android:weightSum="1"
     android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="184dp">
@@ -35,32 +36,71 @@
     </LinearLayout>
 
     <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"></LinearLayout>
+
+    <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="74dp"
         android:weightSum="1">
 
         <ImageButton
-            android:layout_width="311dp"
+            android:layout_width="match_parent"
             android:layout_height="71dp"
             android:src="@drawable/playbtnselector"
             android:id="@+id/playButton"
             android:scaleType="fitCenter"
             android:layout_marginBottom="177dp"
             android:layout_gravity=""
-            android:background="@null"
-            android:layout_weight="1.48" />
+            android:background="@null" />
 
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.28"
+        android:layout_height="58dp"
         android:weightSum="1">
 
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="53dp"
+            android:src="@drawable/settingsbtnselector"
+            android:id="@+id/imageButton"
+            android:scaleType="fitCenter"
+            android:background="@null" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="54dp"
+            android:src="@drawable/scorebtnselector"
+            android:id="@+id/imageButton3"
+            android:scaleType="fitCenter"
+            android:background="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:weightSum="1">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:src="@drawable/creditsbtnselector"
+            android:id="@+id/creditButton"
+            android:scaleType="fitCenter"
+            android:background="@null" />
     </LinearLayout>
 
 </LinearLayout>
