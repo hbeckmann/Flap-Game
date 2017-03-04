@@ -128,7 +128,7 @@ public class MainView extends SurfaceView implements Runnable {
         if(background == null) {
             System.out.println("------------------------------------ reimplementing background");
             background = new Background(currentContext, R.drawable.background01_small, viewWidth, viewHeight);
-            background.setScrollSpeed(1);
+            background.setScrollSpeed(viewWidth / 500);
         }
         viewing = true;
         playButton = (ImageButton) mainActivity.findViewById(R.id.playButton);

@@ -26,7 +26,7 @@ public class Pipe {
     private int vWidth;
     private int vHeight;
     private int width;
-    private int speed;
+    private double speed;
     private int aboveHitboxLeniency;
     private int belowHitboxLeniency;
     private int x;
@@ -104,7 +104,7 @@ public class Pipe {
         return belowOpening;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 

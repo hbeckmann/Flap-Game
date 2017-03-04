@@ -38,7 +38,7 @@ public class Background {
         reverse = new Matrix();
         reverse.preScale(-1, 1);
         reverseBackground = Bitmap.createBitmap(background, 0, 0, background.getWidth(), background.getHeight(), reverse, true);
-        scrollSpeed = 5;
+        scrollSpeed = vWidth / 110;
 
     }
 

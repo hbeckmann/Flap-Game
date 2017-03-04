@@ -20,6 +20,7 @@ import android.view.Window;
 import android.util.DisplayMetrics;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends Activity implements View.OnClickListener, Runnable {
@@ -29,7 +30,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private int viewHeight;
     private int viewWidth;
     private DisplayMetrics displayMetrics;
-    private RelativeLayout menu;
+    private LinearLayout menu;
     private FrameLayout mainMenu;
     private Thread mainThread;
     private volatile boolean clicking;
@@ -47,7 +48,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         View itemInflater = (View) inflater.inflate(R.layout.activity_main, null);
         //The frame layout is used to house the Surface View and the Relative view on top
         mainMenu = new FrameLayout(this);
-        menu = (RelativeLayout)itemInflater.findViewById(R.id.activity_main);
+        menu = (LinearLayout)itemInflater.findViewById(R.id.activity_main);
         displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         viewHeight = displayMetrics.heightPixels;
@@ -98,17 +99,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     public void onStart() {
 
         super.onStart();
-        if(mPlayer == null) {
-            mPlayer = MediaPlayer.create(this, R.raw.roccow_welcome);
-            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mPlayer.start();
-        }
+
 
     }
 
     protected void onResume() {
         super.onResume();
         mainView.resume();
+        if(mPlayer == null) {
+            mPlayer = MediaPlayer.create(this, R.raw.roccow_welcome);
+            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mPlayer.start();
+        }
     }
 
     protected void onPause() {

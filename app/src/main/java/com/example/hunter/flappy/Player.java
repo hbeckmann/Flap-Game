@@ -56,7 +56,7 @@ public class Player {
         this.vWidth = vWidth;
         this.vHeight = vHeight;
         velocity = -(vHeight / 100);
-        acceleration = -1.02;
+        acceleration = -(vHeight / 900); //-1.02;
         //Update this to be relative to screen
         System.out.println(vWidth + " " + vHeight);
         x =  (vWidth / 2) - (width + 100);

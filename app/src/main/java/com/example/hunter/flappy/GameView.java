@@ -257,8 +257,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             firstFrame = false;
             gameThread = new Thread(this);
             gameThread.start();
-            player.setVelocity((vHeight / jumpScale));
-            player.animateJump();
+            player.setVelocity(0);
+//            player.animateJump();
         }
 
         if(!playing && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
