@@ -75,11 +75,33 @@ public class Pipe {
         x -= speed;
     }
 
+    public Boolean update(boolean passedFlag) {
+        if (x <= 0 - width) {
+            x = vWidth;
+            aboveOpening = randomizeAboveOpening(vHeight);
+            aboveHitboxLeniency = (aboveOpening / 10) * 2;
+            belowOpening = randomizeBelowOpening(vHeight);
+            belowHitboxLeniency = (belowOpening / 10) * 2;
+            belowY = (aboveOpening + (vHeight - aboveOpening - belowOpening));
+            aboveBitmap = Bitmap.createScaledBitmap(reverseRawImage, width, aboveOpening, true);
+            belowBitmap = Bitmap.createScaledBitmap(rawImage, width, belowOpening, true);
+            speed += .2;
+            return false;
+        }
+
+        x -= speed;
+
+        return passedFlag;
+    }
+
+
+
     public void reset() {
 
         this.x = vWidth;
         this.randomizeAboveOpening(vHeight);
         this.randomizeBelowOpening(vWidth);
+        this.speed = vWidth / 70;
 
     }
 

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Flappy</string>
+    <string name="app_name">Super Flappy Bird</string>
+    <string name="flap_high_scores">0</string>
 </resources>

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.provider.MediaStore;
@@ -30,9 +31,13 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int vHeight;
     private int vWidth;
     private int jumpScale = 55;
+    private int currentScore;
+    private int highScore;
+    private boolean passedPipes;
 
     private Player player;
     private Pipe pipe;
+    private Score scoreObj;
 
     private final static int FPS = 1000 / 60;
     private long beginTime;
@@ -41,6 +46,10 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int sleepTime;
 
     private Paint paint;
+    private Paint scorePaint;
+    private Paint hscorePaint;
+    private Typeface typeface;
+
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
     private Background background;
@@ -60,10 +69,28 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         player = new Player(context, viewWidth, viewHeight);
         pipe = new Pipe(context, viewWidth, viewHeight);
+        scoreObj = new Score(context);
+        highScore = scoreObj.retrieveHighScore();
+
         paint = new Paint();
+        hscorePaint = new Paint();
+        scorePaint = new Paint();
+        paint.setColor(Color.WHITE);
+        scorePaint.setColor(Color.WHITE);
+        hscorePaint.setColor(Color.WHITE);
+        scorePaint.setTextSize(viewWidth / 5);
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Quicksand-Bold.otf");
+        scorePaint.setTypeface(typeface);
+        hscorePaint.setTypeface(typeface);
+        hscorePaint.setTextSize(viewWidth / 20);
+        scorePaint.setTextAlign(Paint.Align.CENTER);
+        hscorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
+        scorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
+
         readyToDraw = false;
         vHeight = viewHeight;
         vWidth = viewWidth;
+        passedPipes = false;
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
         //Won't work without the while loop - P R O G R A M M I N G
@@ -118,10 +145,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     }
 
     private void update() {
-        pipe.update();
+        passedPipes = pipe.update(passedPipes);
         player.update();
         background.scrollBackground();
+        currentScore = scoreObj.getCurrentScore();
         detectHits();
+        detectScore();
     }
 
     private void draw() {
@@ -178,6 +207,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         pipe.getBelowY(),
                         paint
                 );
+                //Current Score
+                canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
+
+                canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
+
+
             } catch (Exception e) {
                 System.out.println(e.getCause());
             }
@@ -191,6 +226,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     private void control() {
         if(firstFrame && surfaceHolder.getSurface().isValid()) {
+
             playing = false;
         }
 //        try{
@@ -218,6 +254,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
            mediaPlayer = null;
        }
 
+
+
     }
 
     public void resume() {
@@ -225,7 +263,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         //start thread
         playing = true;
         firstFrame = true;
-
 
         gameThread = new Thread(this);
         gameThread.start();
@@ -269,8 +306,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             player.reset();
             playing = true;
             firstFrame = true;
+            highScore = scoreObj.retrieveHighScore();
             gameThread = new Thread(this);
             gameThread.start();
+
+
+
         }
 
         return true;
@@ -286,18 +327,33 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         if(player.getY() + player.getHeight() > vHeight || player.getY() < 0) {
             playing = false;
             firstFrame = false;
+            scoreObj.saveHighScore();
+            scoreObj.reset();
         }
 
         if(player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX()
                 && player.getHitBoxX() < pipe.getX() + pipe.getWidth()
                 && (player.getHitBoxY() < pipe.getAboveY() + pipe.getAboveOpening() - pipe.getAboveHitboxLeniency()
                 || player.getHitBoxY() + player.getHitBoxHeight() > pipe.getBelowY() + pipe.getBelowHitboxLeniency())) {
-            System.out.println("Hitbox Y: " + player.getHitBoxY() + "   Pipe Opening is " + pipe.getAboveY() + pipe.getAboveOpening());
+            //Player has hit a pipe or wall
             playing = false;
             firstFrame = false;
+            scoreObj.saveHighScore();
+            scoreObj.reset();
         }
 
 
     }
+
+    public void detectScore() {
+
+        if (player.getHitBoxX() > pipe.getX() + pipe.getWidth() && !passedPipes) {
+            passedPipes = true;
+            scoreObj.incrementScore();
+        }
+
+    }
+
+
 
 }
