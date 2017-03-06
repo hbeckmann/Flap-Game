@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="114dp"
         android:weightSum="1"
-        android:layout_weight="0.21">
+        android:layout_weight="0.12">
 
         <TextView
             android:text="Programming - Hunter Beckmann"
@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textView5"
-            android:layout_weight="0.10"
+            android:layout_weight="0.19"
             android:textSize="20sp"
             android:fontFamily="sans-serif-condensed"
             android:textColor="@android:color/white"
@@ -83,11 +83,11 @@
         android:layout_height="43dp">
 
         <TextView
-            android:text="Music"
+            android:text="Sound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textView6"
-            android:layout_weight="0.40"
+            android:layout_weight="2.94"
             android:textSize="30sp"
             android:textAlignment="center"
             android:textColor="@android:color/white" />
@@ -96,7 +96,8 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="104dp">
+        android:layout_height="wrap_content"
+        android:layout_weight="0.16">
 
         <TextView
             android:text="Roccow - Welcome!"
@@ -113,6 +114,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textView8"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:text="ProjectU012 - Coin Collect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView13"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textColor="@android:color/white"
+            android:textAlignment="center" />
+
+        <TextView
+            android:text="Newagesoup - Explosion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView14"
+            android:layout_weight="0.09"
             android:fontFamily="sans-serif-condensed"
             android:textSize="20sp"
             android:textAlignment="center"
@@ -135,7 +157,7 @@
             android:textSize="30sp"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:layout_weight="0.24" />
+            android:layout_weight="0.27" />
 
         <TextView
             android:text="Mom and Dad"

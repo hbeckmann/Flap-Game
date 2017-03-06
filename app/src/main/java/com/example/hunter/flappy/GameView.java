@@ -55,6 +55,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Background background;
     private Boolean readyToDraw;
     private MediaPlayer mediaPlayer;
+    private MediaPlayer coinMediaPlayer;
     private Context currentContext;
     private boolean firstFrame;
 
@@ -91,6 +92,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         vHeight = viewHeight;
         vWidth = viewWidth;
         passedPipes = false;
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
         //Won't work without the while loop - P R O G R A M M I N G
@@ -99,6 +101,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         }
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setVolume(1f, 1f);
+
+        coinMediaPlayer = new MediaPlayer();
+        coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
+        //Won't work without the while loop - P R O G R A M M I N G
+        while (coinMediaPlayer == null) {
+            coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
+        }
+        coinMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        coinMediaPlayer.setVolume(1f, 1f);
 
 
     }
@@ -254,6 +265,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
            mediaPlayer = null;
        }
 
+        if(coinMediaPlayer != null) {
+            coinMediaPlayer.stop();
+            coinMediaPlayer.release();
+            coinMediaPlayer = null;
+        }
+
 
 
     }
@@ -350,6 +367,10 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         if (player.getHitBoxX() > pipe.getX() + pipe.getWidth() && !passedPipes) {
             passedPipes = true;
             scoreObj.incrementScore();
+            if(coinMediaPlayer != null) {
+                coinMediaPlayer.seekTo(0);
+                coinMediaPlayer.start();
+            }
         }
 
     }
