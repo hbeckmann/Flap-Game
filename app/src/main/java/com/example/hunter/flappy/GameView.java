@@ -19,6 +19,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Hunter on 2/26/2017.
@@ -46,11 +51,16 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int framesSkipped;
     private long timeDiff;
     private int sleepTime;
+    private int fadeCounter;
+    private boolean fadingOut;
+    private boolean currentlyAnimating;
+    private Timer t;
 
 
     private Paint paint;
     private Paint scorePaint;
     private Paint hscorePaint;
+    private Paint fadePaint;
     private Typeface typeface;
 
     private Canvas canvas;
@@ -88,24 +98,33 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         paint = new Paint();
         hscorePaint = new Paint();
         scorePaint = new Paint();
+        fadePaint = new Paint();
         paint.setColor(Color.WHITE);
         scorePaint.setColor(Color.WHITE);
         hscorePaint.setColor(Color.WHITE);
+        fadePaint.setColor(Color.RED);
         scorePaint.setTextSize(viewWidth / 5);
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Quicksand-Bold.otf");
         scorePaint.setTypeface(typeface);
         hscorePaint.setTypeface(typeface);
+        fadePaint.setTypeface(typeface);
         hscorePaint.setTextSize(viewWidth / 20);
+        fadePaint.setTextSize(viewWidth / 10);
         scorePaint.setTextAlign(Paint.Align.CENTER);
+        fadePaint.setTextAlign(Paint.Align.CENTER);
         hscorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
         scorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
+        fadePaint.setAlpha(5);
 
         deathFrame = 0;
         src = new Rect(0, 0, 100, 100);
         spriteRow = 0;
+        t = new Timer();
+        fadeCounter = 0;
+        currentlyAnimating = false;
 
 
-        expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl);
+        expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl2);
         expSprite = Bitmap.createBitmap(expSpriteRaw);
 
         readyToDraw = false;
@@ -262,8 +281,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
 
+                canvas.drawText("DANGER!", vWidth / 2, vHeight/3, fadePaint);
+
                 if(dying) {
-                    System.out.println("drawing explosion");
                     canvas.drawBitmap(expSprite, src, dst, paint );
                 }
 
@@ -403,11 +423,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             playing = false;
             firstFrame = false;
             dying = true;
+            fadePaint.setAlpha(0);
             deathFrame = 0;
-            if(deathMediaPlayer != null) {
-                deathMediaPlayer.seekTo(0);
-                deathMediaPlayer.start();
-            }
+            restartDeathsound();
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -420,13 +438,26 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             playing = false;
             firstFrame = false;
             dying = true;
+            fadePaint.setAlpha(0);
             deathFrame = 0;
-            if(deathMediaPlayer != null) {
-                deathMediaPlayer.seekTo(0);
-                deathMediaPlayer.start();
-            }
+            restartDeathsound();
             scoreObj.saveHighScore();
             scoreObj.reset();
+        }
+
+        Boolean inPipeCenter = player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX() + pipe.getWidth() / 3
+                && player.getHitBoxX() < pipe.getX() + pipe.getWidth() - pipe.getWidth() / 3;
+
+        Boolean inAboveHitboxLeniency = (player.getHitBoxY() > pipe.getAboveY() + pipe.getAboveOpening() - pipe.getAboveHitboxLeniency()
+                && player.getHitBoxY() < pipe.getAboveY() + pipe.getAboveOpening());
+
+        Boolean inBelowHitboxLeniency = (player.getHitBoxY() + player.getHitBoxHeight() < pipe.getBelowY() + pipe.getBelowHitboxLeniency()
+                && player.getHitBoxY() + player.getHitBoxHeight() > pipe.getBelowY());
+
+        //Close Calls
+        if(inPipeCenter && (inAboveHitboxLeniency || inBelowHitboxLeniency)) {
+            fadingOut = false;
+            animateCloseCall();
         }
 
 
@@ -441,12 +472,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 coinMediaPlayer.seekTo(0);
                 coinMediaPlayer.start();
             }
+
         }
 
     }
 
     public void animateDeath() {
-        System.out.println("attempting to animate death");
         updateSpriteSheet();
         draw();
         deathFrame++;
@@ -467,8 +498,54 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             src = new Rect(0, 100 * spriteRow, 100, 100 * (spriteRow + 1));
         }
 
-        //dst = new Rect(player.getX(), player.getY(), player.getX() + player.getWidth(), player.getY() + player.getHeight());
         dst = new Rect(player.getX() - player.getWidth(), player.getY() - player.getHeight(), player.getX() + player.getWidth() * 2, player.getY() + player.getHeight() * 2);
+
+    }
+
+    public void restartDeathsound() {
+        if(deathMediaPlayer != null) {
+            deathMediaPlayer.seekTo(0);
+            deathMediaPlayer.start();
+        }
+    }
+
+    public void animateCloseCall() {
+
+
+        if(!currentlyAnimating) {
+            currentlyAnimating = true;
+            t = new Timer();
+            t.scheduleAtFixedRate(new TimerTask() {
+
+                                      @Override
+                                      public void run() {
+                                          if(fadeCounter >= 0 && !fadingOut) {
+                                              fadeCounter+=5;
+                                          }
+                                          if(fadeCounter > 254 && !fadingOut) {
+                                              fadingOut = true;
+                                          }
+
+                                          if(fadingOut && fadeCounter != 0) {
+                                              fadeCounter-=5;
+                                          } else if (fadingOut && fadeCounter == 0) {
+                                              currentlyAnimating = false;
+                                              t.cancel();
+                                          }
+
+                                          fadePaint.setAlpha(fadeCounter);
+
+                                      }
+
+                                  },
+
+                    0,
+
+                    5);
+
+        }
+
+
 
 
     }
