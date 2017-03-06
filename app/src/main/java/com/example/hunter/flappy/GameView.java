@@ -66,6 +66,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Boolean readyToDraw;
     private MediaPlayer mediaPlayer;
     private MediaPlayer coinMediaPlayer;
+    private MediaPlayer deathMediaPlayer;
     private Context currentContext;
     private boolean firstFrame;
     private int deathFrame;
@@ -129,6 +130,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         }
         coinMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         coinMediaPlayer.setVolume(1f, 1f);
+
+        deathMediaPlayer = new MediaPlayer();
+        deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
+        //Won't work without the while loop - P R O G R A M M I N G
+        while (deathMediaPlayer == null) {
+            deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
+        }
+        deathMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        deathMediaPlayer.setVolume(1f, 1f);
 
 
     }
@@ -305,6 +315,13 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             coinMediaPlayer = null;
         }
 
+
+        if(deathMediaPlayer != null) {
+            deathMediaPlayer.stop();
+            deathMediaPlayer.release();
+            deathMediaPlayer = null;
+        }
+
         expSpriteRaw.recycle();
         expSprite.recycle();
         expSprite=null;
@@ -387,6 +404,10 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             firstFrame = false;
             dying = true;
             deathFrame = 0;
+            if(deathMediaPlayer != null) {
+                deathMediaPlayer.seekTo(0);
+                deathMediaPlayer.start();
+            }
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -400,6 +421,10 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             firstFrame = false;
             dying = true;
             deathFrame = 0;
+            if(deathMediaPlayer != null) {
+                deathMediaPlayer.seekTo(0);
+                deathMediaPlayer.start();
+            }
             scoreObj.saveHighScore();
             scoreObj.reset();
         }

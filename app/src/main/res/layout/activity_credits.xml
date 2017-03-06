@@ -130,15 +130,15 @@
             android:textAlignment="center" />
 
         <TextView
-            android:text="Newagesoup - Explosion"
+            android:id="@+id/textView14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textView14"
             android:layout_weight="0.09"
             android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
+            android:text="Jobro - Explosion"
             android:textAlignment="center"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
