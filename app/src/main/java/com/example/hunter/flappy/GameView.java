@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -27,6 +28,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     //boolean var to track if game is being played
     volatile boolean playing;
+    volatile boolean dying;
     private Thread gameThread = null;
     private int vHeight;
     private int vWidth;
@@ -45,6 +47,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private long timeDiff;
     private int sleepTime;
 
+
     private Paint paint;
     private Paint scorePaint;
     private Paint hscorePaint;
@@ -53,11 +56,20 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
     private Background background;
+    private Bitmap expSpriteRaw;
+    private Bitmap expSprite;
+    private Rect src;
+    private Rect dst;
+    private int spriteRow;
+
+
     private Boolean readyToDraw;
     private MediaPlayer mediaPlayer;
     private MediaPlayer coinMediaPlayer;
     private Context currentContext;
     private boolean firstFrame;
+    private int deathFrame;
+
 
 
 
@@ -66,7 +78,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         super(context);
 
         surfaceHolder = getHolder();
-        //surfaceHolder.addCallback(new MyCallback());
         background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         player = new Player(context, viewWidth, viewHeight);
         pipe = new Pipe(context, viewWidth, viewHeight);
@@ -87,6 +98,14 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         scorePaint.setTextAlign(Paint.Align.CENTER);
         hscorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
         scorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
+
+        deathFrame = 0;
+        src = new Rect(0, 0, 100, 100);
+        spriteRow = 0;
+
+
+        expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl);
+        expSprite = Bitmap.createBitmap(expSpriteRaw);
 
         readyToDraw = false;
         vHeight = viewHeight;
@@ -153,6 +172,14 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
         }
 
+        while (dying ) {
+            System.out.println("we died boyzzzzzzzzzzzzzzzzzzzzzzzz!");
+            animateDeath();
+            if(deathFrame >= 39) {
+                dying = false;
+            }
+        }
+
     }
 
     private void update() {
@@ -204,6 +231,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         player.getY(),
                         paint
                 );
+                //canvas.drawBitmap(expSprite, 200, 200, paint );
                 //draw the top pipe
                 canvas.drawBitmap(
                         pipe.getAboveBitmap(),
@@ -218,10 +246,16 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         pipe.getBelowY(),
                         paint
                 );
+
                 //Current Score
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
+
+                if(dying) {
+                    System.out.println("drawing explosion");
+                    canvas.drawBitmap(expSprite, src, dst, paint );
+                }
 
 
             } catch (Exception e) {
@@ -270,6 +304,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             coinMediaPlayer.release();
             coinMediaPlayer = null;
         }
+
+        expSpriteRaw.recycle();
+        expSprite.recycle();
+        expSprite=null;
+        expSpriteRaw=null;
 
 
 
@@ -323,6 +362,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             player.reset();
             playing = true;
             firstFrame = true;
+            dying = false;
+            spriteRow = 0;
             highScore = scoreObj.retrieveHighScore();
             gameThread = new Thread(this);
             gameThread.start();
@@ -344,6 +385,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         if(player.getY() + player.getHeight() > vHeight || player.getY() < 0) {
             playing = false;
             firstFrame = false;
+            dying = true;
+            deathFrame = 0;
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -355,6 +398,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             //Player has hit a pipe or wall
             playing = false;
             firstFrame = false;
+            dying = true;
+            deathFrame = 0;
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -374,6 +419,36 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         }
 
     }
+
+    public void animateDeath() {
+        System.out.println("attempting to animate death");
+        updateSpriteSheet();
+        draw();
+        deathFrame++;
+        try {
+            gameThread.sleep(10);
+        } catch (InterruptedException e) {
+            e.getCause();
+        }
+
+
+    }
+
+    public void updateSpriteSheet() {
+
+        src.offset(100, 0);
+        if(deathFrame % 10 == 0) {
+            spriteRow++;
+            src = new Rect(0, 100 * spriteRow, 100, 100 * (spriteRow + 1));
+        }
+
+        //dst = new Rect(player.getX(), player.getY(), player.getX() + player.getWidth(), player.getY() + player.getHeight());
+        dst = new Rect(player.getX() - player.getWidth(), player.getY() - player.getHeight(), player.getX() + player.getWidth() * 2, player.getY() + player.getHeight() * 2);
+
+
+    }
+
+
 
 
 
