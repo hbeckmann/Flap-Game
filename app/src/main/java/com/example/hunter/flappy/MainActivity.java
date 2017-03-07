@@ -41,8 +41,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private Handler handler;
     private ImageButton playButton;
     private ImageButton creditsButton;
+    private ImageButton settingsButton;
     private Intent gameActivity;
     private Intent creditActivity;
+    private Intent settingsActivity;
 
 
     @Override
@@ -53,6 +55,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         mainActivity = this;
         gameActivity = new Intent(this, GameActivity.class);
         creditActivity = new Intent(this, CreditActivity.class);
+        settingsActivity = new Intent(this, SettingsActivity.class);
         //Converts the layout xml into view objects
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemInflater = (View) inflater.inflate(R.layout.activity_main, null);
@@ -125,6 +128,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         playButton.setOnClickListener(playButtonHandler);
         creditsButton = (ImageButton) findViewById(R.id.creditButton);
         creditsButton.setOnClickListener(creditButtonHandler);
+        settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(settingsButtonHandler);
     }
 
     protected void onPause() {
@@ -158,6 +163,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         public void onClick(View v) {
 
             startActivity(creditActivity);
+
+        }
+    };
+
+    View.OnClickListener settingsButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            startActivity(settingsActivity);
 
         }
     };

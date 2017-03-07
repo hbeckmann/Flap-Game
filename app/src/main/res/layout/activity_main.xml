@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="53dp"
             android:src="@drawable/settingsbtnselector"
-            android:id="@+id/imageButton"
+            android:id="@+id/settingsButton"
             android:scaleType="fitCenter"
             android:background="@null" />
 
