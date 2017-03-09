@@ -1,6 +1,7 @@
 package com.example.hunter.flappy;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -54,6 +55,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int fadeCounter;
     private boolean fadingOut;
     private boolean currentlyAnimating;
+    private SharedPreferences sharedpref;
+    private boolean warningsDisabled;
     private Timer t;
 
 
@@ -77,6 +80,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private MediaPlayer mediaPlayer;
     private MediaPlayer coinMediaPlayer;
     private MediaPlayer deathMediaPlayer;
+    private SharedPreferences sharedPref;
+    private float sfxVolume;
     private Context currentContext;
     private boolean firstFrame;
     private int deathFrame;
@@ -88,6 +93,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     public GameView(Context context, int viewWidth, int viewHeight) {
         super(context);
 
+        currentContext = context;
         surfaceHolder = getHolder();
         background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
         player = new Player(context, viewWidth, viewHeight);
@@ -114,7 +120,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         fadePaint.setTextAlign(Paint.Align.CENTER);
         hscorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
         scorePaint.setShadowLayer(10f, 5f, 10f, Color.BLACK );
-        fadePaint.setAlpha(5);
+        fadePaint.setAlpha(0);
 
         deathFrame = 0;
         src = new Rect(0, 0, 100, 100);
@@ -127,10 +133,17 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl2);
         expSprite = Bitmap.createBitmap(expSpriteRaw);
 
-        readyToDraw = false;
         vHeight = viewHeight;
         vWidth = viewWidth;
         passedPipes = false;
+
+        sharedPref = context.getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        sfxVolume = ((float) sharedPref.getInt("sfx_volume", 5) / 10);
+
+        sharedPref = context.getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        warningsDisabled = sharedPref.getBoolean("warning", true);
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
@@ -139,7 +152,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
         }
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setVolume(1f, 1f);
+        mediaPlayer.setVolume(sfxVolume, sfxVolume);
 
         coinMediaPlayer = new MediaPlayer();
         coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
@@ -148,7 +161,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
         }
         coinMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        coinMediaPlayer.setVolume(1f, 1f);
+        coinMediaPlayer.setVolume(sfxVolume, sfxVolume);
 
         deathMediaPlayer = new MediaPlayer();
         deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
@@ -157,7 +170,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
         }
         deathMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        deathMediaPlayer.setVolume(1f, 1f);
+        deathMediaPlayer.setVolume(sfxVolume, sfxVolume);
 
 
     }
@@ -360,6 +373,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         gameThread = new Thread(this);
         gameThread.start();
 
+        sfxVolume = ((float) sharedPref.getInt("sfx_volume", 5) / 10);
+        mediaPlayer.setVolume(sfxVolume, sfxVolume);
+        deathMediaPlayer.setVolume(sfxVolume, sfxVolume);
+        coinMediaPlayer.setVolume(sfxVolume, sfxVolume);
+
+        sharedPref = currentContext.getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        warningsDisabled = sharedPref.getBoolean("warning", false);
+
     }
 
     @Override
@@ -512,36 +534,36 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     public void animateCloseCall() {
 
 
-        if(!currentlyAnimating) {
+        if(!currentlyAnimating && !warningsDisabled) {
             currentlyAnimating = true;
             t = new Timer();
             t.scheduleAtFixedRate(new TimerTask() {
 
-                                      @Override
-                                      public void run() {
-                                          if(fadeCounter >= 0 && !fadingOut) {
-                                              fadeCounter+=5;
-                                          }
-                                          if(fadeCounter > 254 && !fadingOut) {
-                                              fadingOut = true;
-                                          }
+                              @Override
+                              public void run() {
+                                  if(fadeCounter >= 0 && !fadingOut) {
+                                      fadeCounter+=5;
+                                  }
+                                  if(fadeCounter > 254 && !fadingOut) {
+                                      fadingOut = true;
+                                  }
 
-                                          if(fadingOut && fadeCounter != 0) {
-                                              fadeCounter-=5;
-                                          } else if (fadingOut && fadeCounter == 0) {
-                                              currentlyAnimating = false;
-                                              t.cancel();
-                                          }
+                                  if(fadingOut && fadeCounter != 0) {
+                                      fadeCounter-=5;
+                                  } else if (fadingOut && fadeCounter == 0) {
+                                      currentlyAnimating = false;
+                                      t.cancel();
+                                  }
 
-                                          fadePaint.setAlpha(fadeCounter);
+                                  fadePaint.setAlpha(fadeCounter);
 
-                                      }
+                              }
 
-                                  },
+                          },
 
-                    0,
+            0,
 
-                    5);
+            5);
 
         }
 

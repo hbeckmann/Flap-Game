@@ -3,6 +3,7 @@ package com.example.hunter.flappy;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.media.AudioManager;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -45,6 +47,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private Intent gameActivity;
     private Intent creditActivity;
     private Intent settingsActivity;
+    private SharedPreferences sharedPref;
+    private float volume;
 
 
     @Override
@@ -68,12 +72,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         viewWidth = displayMetrics.widthPixels;
         mainView = new MainView(this, mainActivity, viewWidth, viewHeight);
 
+        sharedPref = getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        volume = (float) ((float) sharedPref.getInt("music_volume", 5) / 10);
+
+
         //uses the layout xml instead of drawing on a surfaceHolder
         //setContentView(R.layout.activity_main);
         //setContentView(mainView);
         //mainView.setOnClickListener(this);
-
-
 
         mainMenu.addView(mainView);
         mainMenu.addView(menu);
@@ -83,7 +90,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         if(mPlayer == null) {
             mPlayer = MediaPlayer.create(this, R.raw.roccow_welcome);
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mPlayer.setVolume(.5f, .5f);
+            mPlayer.setVolume(volume, volume);
             mPlayer.start();
         }
 
@@ -130,6 +137,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         creditsButton.setOnClickListener(creditButtonHandler);
         settingsButton = (ImageButton) findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(settingsButtonHandler);
+
+        volume = (float) ((float) sharedPref.getInt("music_volume", 5) / 10);
+        mPlayer.setVolume(volume, volume);
     }
 
     protected void onPause() {

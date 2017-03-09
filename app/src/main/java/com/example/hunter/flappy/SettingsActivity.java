@@ -8,6 +8,8 @@ import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -32,8 +34,10 @@ public class SettingsActivity extends Activity{
     private SharedPreferences.Editor editor;
     private int musicVolume;
     private int sfxVolume;
+    private boolean warningStatus;
     private SeekBar musicSeekbar;
     private SeekBar sfxSeekbar;
+    private CheckBox warningCheck;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +57,8 @@ public class SettingsActivity extends Activity{
 
         musicSeekbar = (SeekBar) settingsMenu.findViewById(R.id.musicSeekbar);
         sfxSeekbar = (SeekBar) settingsMenu.findViewById(R.id.sfxSeekbar);
+        warningCheck = (CheckBox) settingsMenu.findViewById(R.id.checkBox);
+
 
 
 
@@ -74,7 +80,6 @@ public class SettingsActivity extends Activity{
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 editor = sharedPref.edit();
-                editor.clear();
                 editor.putInt("music_volume", progress);
                 editor.commit();
 
@@ -99,7 +104,6 @@ public class SettingsActivity extends Activity{
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 editor = sharedPref.edit();
-                editor.clear();
                 editor.putInt("sfx_volume", progress);
                 editor.commit();
 
@@ -107,7 +111,18 @@ public class SettingsActivity extends Activity{
             }
         });
 
-        //TODO: warning checkbox
+        warningCheck.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                editor = sharedPref.edit();
+                editor.putBoolean("warning", isChecked);
+                editor.commit();
+            }
+
+        });
+
+        //TODO: SOUNDS AND MUSIC FOR REFERENCE
 
 
         frame.addView(backdrop);
@@ -122,6 +137,7 @@ public class SettingsActivity extends Activity{
         backdrop.resume();
         retrieveSfxVolume();
         retriveMusicVolume();
+        retrieveWarningStatus();
 
     }
 
@@ -151,6 +167,13 @@ public class SettingsActivity extends Activity{
                 "Settings", Context.MODE_PRIVATE);
         sfxVolume = sharedPref.getInt("sfx_volume", 5);
         sfxSeekbar.setProgress(sfxVolume);
+    }
+
+    public void retrieveWarningStatus() {
+        sharedPref = getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        warningStatus = sharedPref.getBoolean("warning", false);
+        warningCheck.setChecked(warningStatus);
     }
 
 

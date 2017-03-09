@@ -1,7 +1,9 @@
 package com.example.hunter.flappy;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -21,6 +23,8 @@ public class GameActivity extends Activity {
     private int viewHeight;
     private int viewWidth;
     private MediaPlayer mPlayer;
+    private float musicVolume;
+    private SharedPreferences sharedPref;
 
 
 
@@ -35,9 +39,13 @@ public class GameActivity extends Activity {
         gameView = new GameView(this, viewWidth, viewHeight);
         setContentView(gameView);
 
+        sharedPref = getSharedPreferences(
+                "Settings", Context.MODE_PRIVATE);
+        musicVolume = ((float) sharedPref.getInt("music_volume", 5) / 10);
+
         mPlayer = MediaPlayer.create(this, R.raw.something_elated);
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mPlayer.setVolume(.5f, .5f);
+        mPlayer.setVolume(musicVolume, musicVolume);
         mPlayer.start();
 
 
@@ -65,6 +73,9 @@ public class GameActivity extends Activity {
 
         super.onResume();
         gameView.resume();
+
+        musicVolume = ((float) sharedPref.getInt("music_volume", 5) / 10);
+        mPlayer.setVolume(musicVolume, musicVolume);
 
     }
 
