@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -145,7 +146,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 "Settings", Context.MODE_PRIVATE);
         warningsDisabled = sharedPref.getBoolean("warning", true);
 
-        powerup = new Powerups(player);
+        powerup = new Powerups(player, pipe);
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
@@ -233,6 +234,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         currentScore = scoreObj.getCurrentScore();
         detectHits();
         detectScore();
+        detectPowerupGet();
+        powerup.updatePosition();
     }
 
     private void draw() {
@@ -293,6 +296,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
                 //Current Score
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
+
+                //Testing PowerupS REMOVE LATER
+                canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
 
@@ -497,6 +503,19 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 coinMediaPlayer.seekTo(0);
                 coinMediaPlayer.start();
             }
+
+        }
+
+    }
+
+    public void detectPowerupGet() {
+
+        boolean leftCollision = (player.getX() > powerup.getX() - player.getWidth() && player.getX() < powerup.getX() + powerup.getWidth());
+        boolean topCollision = player.getY() >= powerup.getY() - player.getHeight() && player.getY() <= powerup.getY() + powerup.getHeight();
+        
+        if (topCollision && leftCollision) {
+
+            Log.d("POWERING UP   :", "ANTIGRAVITY ACTIVATED!!");
 
         }
 
