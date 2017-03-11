@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="Flappy"
-    xmlns:app2="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -83,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="54dp"
             android:src="@drawable/scorebtnselector"
-            android:id="@+id/imageButton3"
+            android:id="@+id/highscoreButton"
             android:scaleType="fitCenter"
             android:background="@null" />
     </LinearLayout>

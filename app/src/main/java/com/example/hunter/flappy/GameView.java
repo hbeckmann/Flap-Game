@@ -87,7 +87,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int deathFrame;
 
 
-
+    Powerups powerup;
 
     //Class constructor
     public GameView(Context context, int viewWidth, int viewHeight) {
@@ -144,6 +144,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         sharedPref = context.getSharedPreferences(
                 "Settings", Context.MODE_PRIVATE);
         warningsDisabled = sharedPref.getBoolean("warning", true);
+
+        powerup = new Powerups(player);
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
@@ -450,6 +452,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             restartDeathsound();
             scoreObj.saveHighScore();
             scoreObj.reset();
+
         }
 
         if(player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX()

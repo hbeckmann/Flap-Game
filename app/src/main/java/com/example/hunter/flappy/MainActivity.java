@@ -44,9 +44,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
     private ImageButton playButton;
     private ImageButton creditsButton;
     private ImageButton settingsButton;
+    private ImageButton highscoreButton;
     private Intent gameActivity;
     private Intent creditActivity;
     private Intent settingsActivity;
+    private Intent highscoreActivity;
     private SharedPreferences sharedPref;
     private float volume;
 
@@ -60,6 +62,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         gameActivity = new Intent(this, GameActivity.class);
         creditActivity = new Intent(this, CreditActivity.class);
         settingsActivity = new Intent(this, SettingsActivity.class);
+        highscoreActivity = new Intent(this, HighscoreActivity.class);
         //Converts the layout xml into view objects
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemInflater = (View) inflater.inflate(R.layout.activity_main, null);
@@ -137,6 +140,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         creditsButton.setOnClickListener(creditButtonHandler);
         settingsButton = (ImageButton) findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(settingsButtonHandler);
+        highscoreButton = (ImageButton) findViewById(R.id.highscoreButton);
+        highscoreButton.setOnClickListener(highscoreButtonHandler);
 
         volume = (float) ((float) sharedPref.getInt("music_volume", 5) / 10);
         mPlayer.setVolume(volume, volume);
@@ -182,7 +187,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
 
             startActivity(settingsActivity);
 
+
         }
     };
 
+    View.OnClickListener highscoreButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            ;
+            startActivity(highscoreActivity);
+
+        }
+    };
 }

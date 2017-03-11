@@ -167,4 +167,7 @@ public class Player {
         sprites = null;
     }
 
+    public void setAcceleration(double acceleration) {
+        this.acceleration = acceleration;
+    }
 }
