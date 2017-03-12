@@ -3,6 +3,7 @@ package com.example.hunter.flappy;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.provider.Settings;
 
 /**
@@ -34,10 +35,17 @@ public class Player {
     private int hitBoxY;
     private int hitBoxWidth;
     private int hitBoxHeight;
+    private Bitmap expSpriteRaw;
+    private Bitmap expSprite;
+    private Rect src;
+    private Rect dst;
+    private int spriteRow;
+    private GameView gv;
 
-    public Player(Context context, int vWidth, int vHeight) {
+    public Player(Context context, int vWidth, int vHeight, GameView gv) {
 
         currentContext = context;
+        this.gv = gv;
         BitmapFactory.Options bitmapLoadingOptions = new BitmapFactory.Options();
         bitmapLoadingOptions.inPreferredConfig = Bitmap.Config.RGB_565;
         height = (vHeight + 168) / heightScale;
@@ -67,6 +75,10 @@ public class Player {
         bitmap = Bitmap.createScaledBitmap(rawImage, height, width, true);
         //spriteTimer = new Thread();
         jumping = false;
+        src = new Rect(0, 0, 100, 100);
+        spriteRow = 0;
+        expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl2);
+        expSprite = Bitmap.createBitmap(expSpriteRaw);
     }
 
     //Method to update character data
@@ -98,6 +110,25 @@ public class Player {
             jumping = false;
         }
 
+    }
+
+    public void updateSpriteSheet() {
+
+        src.offset(100, 0);
+        if(gv.getDeathFrame() % 10 == 0) {
+            spriteRow++;
+            src = new Rect(0, 100 * spriteRow, 100, 100 * (spriteRow + 1));
+        }
+
+        dst = new Rect(x - width, y - height, x + width * 2, y + height * 2);
+
+    }
+
+    public void destroyExSprite() {
+        expSpriteRaw.recycle();
+        expSprite.recycle();
+        expSprite=null;
+        expSpriteRaw=null;
     }
 
     public void reset () {
@@ -157,6 +188,30 @@ public class Player {
 
     public int getHitBoxHeight() {
         return hitBoxHeight;
+    }
+
+    public Bitmap getExpSpriteRaw() {
+        return expSpriteRaw;
+    }
+
+    public Bitmap getExpSprite() {
+        return expSprite;
+    }
+
+    public Rect getSrc() {
+        return src;
+    }
+
+    public Rect getDst() {
+        return dst;
+    }
+
+    public int getSpriteRow() {
+        return spriteRow;
+    }
+
+    public void setSpriteRow(int spriteRow) {
+        this.spriteRow = spriteRow;
     }
 
     public void releaseSprites() {

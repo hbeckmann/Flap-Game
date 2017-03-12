@@ -68,11 +68,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
     private Background background;
-    private Bitmap expSpriteRaw;
-    private Bitmap expSprite;
-    private Rect src;
-    private Rect dst;
-    private int spriteRow;
 
     private SharedPreferences sharedPref;
     private Context currentContext;
@@ -88,7 +83,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         currentContext = context;
         surfaceHolder = getHolder();
         background = new Background(context, R.drawable.background01_small, viewWidth, viewHeight);
-        player = new Player(context, viewWidth, viewHeight);
+        player = new Player(context, viewWidth, viewHeight, this);
         pipe = new Pipe(context, viewWidth, viewHeight);
         scoreObj = new Score(context);
         highScore = scoreObj.retrieveHighScore();
@@ -117,15 +112,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         fadePaint.setAlpha(0);
 
         deathFrame = 0;
-        src = new Rect(0, 0, 100, 100);
-        spriteRow = 0;
         t = new Timer();
         fadeCounter = 0;
         currentlyAnimating = false;
-
-
-        expSpriteRaw = BitmapFactory.decodeResource(context.getResources(), R.drawable.testingxpl2);
-        expSprite = Bitmap.createBitmap(expSpriteRaw);
 
         vHeight = viewHeight;
         vWidth = viewWidth;
@@ -184,7 +173,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         }
 
         while (dying ) {
-            System.out.println("we died boyzzzzzzzzzzzzzzzzzzzzzzzz!");
             animateDeath();
             if(deathFrame >= 39) {
                 dying = false;
@@ -269,7 +257,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 canvas.drawText("DANGER!", vWidth / 2, vHeight/3, fadePaint);
 
                 if(dying) {
-                    canvas.drawBitmap(expSprite, src, dst, paint );
+                    canvas.drawBitmap(player.getExpSprite(), player.getSrc(), player.getDst(), paint );
                 }
 
 
@@ -308,10 +296,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         player.releaseSprites();
         pipe.recycleBitmaps();
         background.releaseBitmaps();
-        expSpriteRaw.recycle();
-        expSprite.recycle();
-        expSprite=null;
-        expSpriteRaw=null;
+        player.destroyExSprite();
 
 
 
@@ -372,7 +357,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             playing = true;
             firstFrame = true;
             dying = false;
-            spriteRow = 0;
+            player.setSpriteRow(0);
             highScore = scoreObj.retrieveHighScore();
             gameThread = new Thread(this);
             gameThread.start();
@@ -385,7 +370,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     }
 
     public void animateDeath() {
-        updateSpriteSheet();
+        player.updateSpriteSheet();
         draw();
         deathFrame++;
         try {
@@ -397,17 +382,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     }
 
-    public void updateSpriteSheet() {
 
-        src.offset(100, 0);
-        if(deathFrame % 10 == 0) {
-            spriteRow++;
-            src = new Rect(0, 100 * spriteRow, 100, 100 * (spriteRow + 1));
-        }
-
-        dst = new Rect(player.getX() - player.getWidth(), player.getY() - player.getHeight(), player.getX() + player.getWidth() * 2, player.getY() + player.getHeight() * 2);
-
-    }
 
     public void animateCloseCall() {
 
