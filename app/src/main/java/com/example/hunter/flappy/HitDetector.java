@@ -27,10 +27,7 @@ public class HitDetector {
         if (player.getHitBoxX() > pipe.getX() + pipe.getWidth() && !gv.isPassedPipes()) {
             gv.setPassedPipes(true);
             scoreObj.incrementScore();
-            if(gv.getCoinMediaPlayer() != null) {
-                gv.getCoinMediaPlayer().seekTo(0);
-                gv.getCoinMediaPlayer().start();
-            }
+            gv.getSoundManager().restartCoinMediaPlayer();
 
         }
 
@@ -44,7 +41,7 @@ public class HitDetector {
             gv.setDying(true);
             gv.getFadePaint().setAlpha(0);
             gv.setDeathFrame(0);
-            gv.restartDeathsound();
+            gv.getSoundManager().restartDeathMediaPlayer();
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -59,7 +56,7 @@ public class HitDetector {
             gv.setDying(true);
             gv.getFadePaint().setAlpha(0);
             gv.setDeathFrame(0);
-            gv.restartDeathsound();
+            gv.getSoundManager().restartDeathMediaPlayer();
             scoreObj.saveHighScore();
             scoreObj.reset();
         }
@@ -94,6 +91,12 @@ public class HitDetector {
 
         }
 
+    }
+
+    public void update() {
+        detectPowerupGet();
+        detectHits();
+        detectScore();
     }
 
 

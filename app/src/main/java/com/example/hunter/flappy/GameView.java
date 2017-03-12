@@ -10,9 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
@@ -56,11 +53,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int fadeCounter;
     private boolean fadingOut;
     private boolean currentlyAnimating;
-    private SharedPreferences sharedpref;
     private boolean warningsDisabled;
     private Timer t;
 
     private HitDetector hitDetector;
+    private SoundManager soundManager;
 
     private Paint paint;
     private Paint scorePaint;
@@ -77,17 +74,10 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Rect dst;
     private int spriteRow;
 
-
-    private Boolean readyToDraw;
-    private MediaPlayer mediaPlayer;
-    private MediaPlayer coinMediaPlayer;
-    private MediaPlayer deathMediaPlayer;
     private SharedPreferences sharedPref;
-    private float sfxVolume;
     private Context currentContext;
     private boolean firstFrame;
     private int deathFrame;
-
 
     Powerups powerup;
 
@@ -143,41 +133,13 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
         sharedPref = context.getSharedPreferences(
                 "Settings", Context.MODE_PRIVATE);
-        sfxVolume = ((float) sharedPref.getInt("sfx_volume", 5) / 10);
-
-        sharedPref = context.getSharedPreferences(
-                "Settings", Context.MODE_PRIVATE);
         warningsDisabled = sharedPref.getBoolean("warning", true);
 
         powerup = new Powerups(player, pipe);
         hitDetector = new HitDetector(this);
+        soundManager = new SoundManager(this);
+        soundManager.setAllPlayers();
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
-        //Won't work without the while loop - P R O G R A M M I N G
-        while (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
-        }
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setVolume(sfxVolume, sfxVolume);
-
-        coinMediaPlayer = new MediaPlayer();
-        coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
-        //Won't work without the while loop - P R O G R A M M I N G
-        while (coinMediaPlayer == null) {
-            coinMediaPlayer = MediaPlayer.create(context, R.raw.coin2);
-        }
-        coinMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        coinMediaPlayer.setVolume(sfxVolume, sfxVolume);
-
-        deathMediaPlayer = new MediaPlayer();
-        deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
-        //Won't work without the while loop - P R O G R A M M I N G
-        while (deathMediaPlayer == null) {
-            deathMediaPlayer = MediaPlayer.create(context, R.raw.explosion2);
-        }
-        deathMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        deathMediaPlayer.setVolume(sfxVolume, sfxVolume);
 
 
     }
@@ -236,9 +198,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         player.update();
         background.scrollBackground();
         currentScore = scoreObj.getCurrentScore();
-        hitDetector.detectHits();
-        hitDetector.detectScore();
-        hitDetector.detectPowerupGet();
+        hitDetector.update();
         powerup.updatePosition();
     }
 
@@ -348,25 +308,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         player.releaseSprites();
         pipe.recycleBitmaps();
         background.releaseBitmaps();
-       if(mediaPlayer != null) {
-           mediaPlayer.stop();
-           mediaPlayer.release();
-           mediaPlayer = null;
-       }
-
-        if(coinMediaPlayer != null) {
-            coinMediaPlayer.stop();
-            coinMediaPlayer.release();
-            coinMediaPlayer = null;
-        }
-
-
-        if(deathMediaPlayer != null) {
-            deathMediaPlayer.stop();
-            deathMediaPlayer.release();
-            deathMediaPlayer = null;
-        }
-
         expSpriteRaw.recycle();
         expSprite.recycle();
         expSprite=null;
@@ -385,10 +326,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         gameThread = new Thread(this);
         gameThread.start();
 
-        sfxVolume = ((float) sharedPref.getInt("sfx_volume", 5) / 10);
-        mediaPlayer.setVolume(sfxVolume, sfxVolume);
-        deathMediaPlayer.setVolume(sfxVolume, sfxVolume);
-        coinMediaPlayer.setVolume(sfxVolume, sfxVolume);
+
 
         sharedPref = currentContext.getSharedPreferences(
                 "Settings", Context.MODE_PRIVATE);
@@ -403,9 +341,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             //Player is jumping
            player.setVelocity((vHeight / jumpScale));
            player.animateJump();
-            if(mediaPlayer != null) {
-                mediaPlayer.seekTo(0);
-                mediaPlayer.start();
+            if(soundManager.getMediaPlayer() != null) {
+                soundManager.getMediaPlayer().seekTo(0);
+                soundManager.getMediaPlayer().start();
             }
 
 
@@ -471,13 +409,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     }
 
-    public void restartDeathsound() {
-        if(deathMediaPlayer != null) {
-            deathMediaPlayer.seekTo(0);
-            deathMediaPlayer.start();
-        }
-    }
-
     public void animateCloseCall() {
 
 
@@ -533,10 +464,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     public Pipe getPipe() {
         return pipe;
-    }
-
-    public MediaPlayer getCoinMediaPlayer() {
-        return coinMediaPlayer;
     }
 
     public Score getScoreObj() {
@@ -599,4 +526,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         return powerup;
     }
 
+    public Context getCurrentContext() {
+        return currentContext;
+    }
+
+    public SoundManager getSoundManager() {
+        return soundManager;
+    }
 }
