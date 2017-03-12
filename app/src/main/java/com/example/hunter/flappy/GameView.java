@@ -60,6 +60,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private boolean warningsDisabled;
     private Timer t;
 
+    private HitDetector hitDetector;
 
     private Paint paint;
     private Paint scorePaint;
@@ -101,6 +102,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         pipe = new Pipe(context, viewWidth, viewHeight);
         scoreObj = new Score(context);
         highScore = scoreObj.retrieveHighScore();
+
+
 
         paint = new Paint();
         hscorePaint = new Paint();
@@ -147,6 +150,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         warningsDisabled = sharedPref.getBoolean("warning", true);
 
         powerup = new Powerups(player, pipe);
+        hitDetector = new HitDetector(this);
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, R.raw.jump2);
@@ -232,9 +236,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         player.update();
         background.scrollBackground();
         currentScore = scoreObj.getCurrentScore();
-        detectHits();
-        detectScore();
-        detectPowerupGet();
+        hitDetector.detectHits();
+        hitDetector.detectScore();
+        hitDetector.detectPowerupGet();
         powerup.updatePosition();
     }
 
@@ -298,7 +302,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
 
                 //Testing PowerupS REMOVE LATER
-                canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
+                //canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
 
@@ -442,85 +446,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         return true;
     }
 
-    public Background getBackgroundObject() {
-        return background;
-    }
-
-
-    public void detectHits() {
-
-        if(player.getY() + player.getHeight() > vHeight || player.getY() < 0) {
-            playing = false;
-            firstFrame = false;
-            dying = true;
-            fadePaint.setAlpha(0);
-            deathFrame = 0;
-            restartDeathsound();
-            scoreObj.saveHighScore();
-            scoreObj.reset();
-
-        }
-
-        if(player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX()
-                && player.getHitBoxX() < pipe.getX() + pipe.getWidth()
-                && (player.getHitBoxY() < pipe.getAboveY() + pipe.getAboveOpening() - pipe.getAboveHitboxLeniency()
-                || player.getHitBoxY() + player.getHitBoxHeight() > pipe.getBelowY() + pipe.getBelowHitboxLeniency())) {
-            //Player has hit a pipe or wall
-            playing = false;
-            firstFrame = false;
-            dying = true;
-            fadePaint.setAlpha(0);
-            deathFrame = 0;
-            restartDeathsound();
-            scoreObj.saveHighScore();
-            scoreObj.reset();
-        }
-
-        Boolean inPipeCenter = player.getHitBoxX() + player.getHitBoxWidth() >= pipe.getX() + pipe.getWidth() / 3
-                && player.getHitBoxX() < pipe.getX() + pipe.getWidth() - pipe.getWidth() / 3;
-
-        Boolean inAboveHitboxLeniency = (player.getHitBoxY() > pipe.getAboveY() + pipe.getAboveOpening() - pipe.getAboveHitboxLeniency()
-                && player.getHitBoxY() < pipe.getAboveY() + pipe.getAboveOpening());
-
-        Boolean inBelowHitboxLeniency = (player.getHitBoxY() + player.getHitBoxHeight() < pipe.getBelowY() + pipe.getBelowHitboxLeniency()
-                && player.getHitBoxY() + player.getHitBoxHeight() > pipe.getBelowY());
-
-        //Close Calls
-        if(inPipeCenter && (inAboveHitboxLeniency || inBelowHitboxLeniency)) {
-            fadingOut = false;
-            animateCloseCall();
-        }
-
-
-    }
-
-    public void detectScore() {
-
-        if (player.getHitBoxX() > pipe.getX() + pipe.getWidth() && !passedPipes) {
-            passedPipes = true;
-            scoreObj.incrementScore();
-            if(coinMediaPlayer != null) {
-                coinMediaPlayer.seekTo(0);
-                coinMediaPlayer.start();
-            }
-
-        }
-
-    }
-
-    public void detectPowerupGet() {
-
-        boolean leftCollision = (player.getX() > powerup.getX() - player.getWidth() && player.getX() < powerup.getX() + powerup.getWidth());
-        boolean topCollision = player.getY() >= powerup.getY() - player.getHeight() && player.getY() <= powerup.getY() + powerup.getHeight();
-        
-        if (topCollision && leftCollision) {
-
-            Log.d("POWERING UP   :", "ANTIGRAVITY ACTIVATED!!");
-
-        }
-
-    }
-
     public void animateDeath() {
         updateSpriteSheet();
         draw();
@@ -594,8 +519,84 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     }
 
+    public boolean isPassedPipes() {
+        return passedPipes;
+    }
 
+    public void setPassedPipes(boolean passedPipes) {
+        this.passedPipes = passedPipes;
+    }
 
+    public Player getPlayer() {
+        return player;
+    }
 
+    public Pipe getPipe() {
+        return pipe;
+    }
+
+    public MediaPlayer getCoinMediaPlayer() {
+        return coinMediaPlayer;
+    }
+
+    public Score getScoreObj() {
+        return scoreObj;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    public boolean isDying() {
+        return dying;
+    }
+
+    public void setDying(boolean dying) {
+        this.dying = dying;
+    }
+
+    public Paint getFadePaint() {
+        return fadePaint;
+    }
+
+    public boolean isFirstFrame() {
+        return firstFrame;
+    }
+
+    public void setFirstFrame(boolean firstFrame) {
+        this.firstFrame = firstFrame;
+    }
+
+    public int getDeathFrame() {
+        return deathFrame;
+    }
+
+    public void setDeathFrame(int deathFrame) {
+        this.deathFrame = deathFrame;
+    }
+
+    public boolean isFadingOut() {
+        return fadingOut;
+    }
+
+    public void setFadingOut(boolean fadingOut) {
+        this.fadingOut = fadingOut;
+    }
+
+    public int getvHeight() {
+        return vHeight;
+    }
+
+    public int getvWidth() {
+        return vWidth;
+    }
+
+    public Powerups getPowerup() {
+        return powerup;
+    }
 
 }
