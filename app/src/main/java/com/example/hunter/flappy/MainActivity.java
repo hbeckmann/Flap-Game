@@ -126,6 +126,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
 
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
         mainView.resume();
@@ -147,6 +148,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         mPlayer.setVolume(volume, volume);
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
         mainView.pause();
@@ -158,6 +160,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Runn
         }
         mainView.getBackgroundObject().releaseBitmaps();
         mainView.background = null;
+        Log.w("Pausing Main Activity", "True");
     }
 
     @Override

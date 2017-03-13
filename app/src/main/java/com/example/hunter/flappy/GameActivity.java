@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.LayoutInflater;
@@ -82,7 +83,7 @@ public class GameActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(mPlayer == null && !mPlayer.isPlaying()) {
+        if(mPlayer == null) {
             mPlayer = MediaPlayer.create(this, R.raw.something_elated);
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mPlayer.start();
@@ -92,15 +93,16 @@ public class GameActivity extends Activity {
 
     @Override
     protected void onStop() {
-        System.out.println("------------ EXITING AND DRESTROYING BACKGROUND");
+        super.onStop();
+        super.finish();
+        Log.w("Stopping Game Activity", "True");
         if(mPlayer != null && mPlayer.isPlaying()) {
             mPlayer.reset();
             mPlayer.stop();
             mPlayer.release();
             mPlayer = null;
         }
-        super.onStop();
-        super.finish();
+
     }
 
 

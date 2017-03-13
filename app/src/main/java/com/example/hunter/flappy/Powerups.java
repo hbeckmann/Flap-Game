@@ -1,7 +1,10 @@
 package com.example.hunter.flappy;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Hunter on 3/5/2017.
@@ -17,33 +20,71 @@ public class Powerups {
     private Powerup randomPowerup;
     private Player player;
     private Pipe pipe;
+    private int vWidth;
+    private int vHeight;
+    private Random rand;
+    private Boolean powerupAppeared;
+    private Bitmap bitmap;
 
 
-    public Powerups(Player player, Pipe pipe) {
+
+    public Powerups(Player player, Pipe pipe, int vWidth, int vHeight) {
+        this.vWidth = vWidth;
+        this.vHeight = vHeight;
         this.width = 50;
         this.height = 50;
         this.player = player;
         this.pipe = pipe;
+        this.powerupAppeared = true;
+        rand = new Random();
         powerupList = new ArrayList<Powerup>();
         powerupList.add(new Powerup("Anti-Gravity", new ReverseGravity()));
         randomizePosition();
-
+        this.x = pipe.getX() + (vWidth / 2);
         //powerupList.get(0).activatePowerup();
+
+
     }
+
 
     public void randomizePowerup() {
         //Randomizes the powerup
 
     }
 
-    public void randomizePosition() {
+    public void startPowerupEffect() {
 
+    }
+
+    public void randomizePowerupTiming() {
+        if(rand.nextInt(4) < 1) {
+            powerupAppeared = true;
+            randomizePosition();
+        } else  {
+            powerupAppeared = false;
+            this.y = vHeight - this.height - 10;
+        }
+    }
+
+    public void randomizePosition() {
+        this.y = rand.nextInt(vHeight);
     }
 
     public void updatePosition() {
-        this.x = pipe.getX() - 500;
-        this.y = 1000;
+        if(powerupAppeared && x + width > 0) {
+            this.x -= pipe.getSpeed();
+        } else if (powerupAppeared && x + width < 0) {
+            randomizePowerupTiming();
+            this.x = pipe.getX() + (vWidth / 2) + pipe.getWidth();
+        } else if(!powerupAppeared && x + width > 0) {
+            this.x -= pipe.getSpeed();
+        } else {
+            this.x = pipe.getX() + (vWidth / 2) + pipe.getWidth();
+            randomizePowerupTiming();
+        }
+
     }
+
 
     public int getX() {
       return x;

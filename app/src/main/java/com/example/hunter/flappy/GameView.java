@@ -124,7 +124,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 "Settings", Context.MODE_PRIVATE);
         warningsDisabled = sharedPref.getBoolean("warning", true);
 
-        powerup = new Powerups(player, pipe);
+        powerup = new Powerups(player, pipe, vWidth, vHeight);
         hitDetector = new HitDetector(this);
         soundManager = new SoundManager(this);
         soundManager.setAllPlayers();
@@ -135,7 +135,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     @Override
     public void run() {
-        System.out.println("beginning to run!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         while (playing) {
             beginTime = System.currentTimeMillis();
             framesSkipped = 0;
@@ -151,13 +150,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 timeDiff = System.currentTimeMillis() - beginTime;
 
                 sleepTime = (int) (FPS - timeDiff);
-                //System.out.println(sleepTime);
 
                 if(sleepTime > 0) {
                     try {
                         gameThread.sleep(sleepTime);
                     } catch (InterruptedException e) {
-                        System.out.println(e.getCause());
+                       e.getCause();
                     }
 
                 }
@@ -192,8 +190,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     private void draw() {
         //check if surface is valid
-        //System.out.println("Attempting Draw!!!!!!!!!!!!!!!!!!!!!");
-        //System.out.println(surfaceHolder.getSurface().isValid());
         if (surfaceHolder.getSurface().isValid()) {
 
             //lock the canvas
@@ -250,7 +246,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
 
                 //Testing PowerupS REMOVE LATER
-                //canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
+                canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
 
@@ -262,7 +258,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
 
             } catch (Exception e) {
-                System.out.println(e.getCause());
+                e.getCause();
             }
 
             //unlock the canvas
@@ -297,6 +293,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         pipe.recycleBitmaps();
         background.releaseBitmaps();
         player.destroyExSprite();
+        Log.w("Pausing Game View", "TRUE");
 
 
 
