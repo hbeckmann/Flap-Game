@@ -1,6 +1,8 @@
 package com.example.hunter.flappy;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +30,11 @@ public class Powerups {
 
 
 
-    public Powerups(Player player, Pipe pipe, int vWidth, int vHeight) {
+    public Powerups(Player player, Pipe pipe, int vWidth, int vHeight, Context currentContext) {
         this.vWidth = vWidth;
         this.vHeight = vHeight;
-        this.width = 50;
-        this.height = 50;
+        this.width = vWidth / 7;
+        this.height = vHeight / 12;
         this.player = player;
         this.pipe = pipe;
         this.powerupAppeared = true;
@@ -41,6 +43,7 @@ public class Powerups {
         powerupList.add(new Powerup("Anti-Gravity", new ReverseGravity()));
         randomizePosition();
         this.x = pipe.getX() + (vWidth / 2);
+        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(currentContext.getResources(), R.drawable.box), width, height, true);
         //powerupList.get(0).activatePowerup();
 
 
@@ -62,7 +65,7 @@ public class Powerups {
             randomizePosition();
         } else  {
             powerupAppeared = false;
-            this.y = vHeight - this.height - 10;
+            this.y = 0 - this.height - 100;
         }
     }
 
@@ -116,6 +119,10 @@ public class Powerups {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
     interface Callback {

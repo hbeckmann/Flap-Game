@@ -124,7 +124,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 "Settings", Context.MODE_PRIVATE);
         warningsDisabled = sharedPref.getBoolean("warning", true);
 
-        powerup = new Powerups(player, pipe, vWidth, vHeight);
+        powerup = new Powerups(player, pipe, vWidth, vHeight, currentContext);
         hitDetector = new HitDetector(this);
         soundManager = new SoundManager(this);
         soundManager.setAllPlayers();
@@ -242,11 +242,16 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         paint
                 );
 
+                //Draw Powerup
+                canvas.drawBitmap(
+                        powerup.getBitmap(),
+                        powerup.getX(),
+                        powerup.getY(),
+                        paint
+                );
+
                 //Current Score
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
-
-                //Testing PowerupS REMOVE LATER
-                canvas.drawRect((float) powerup.getX(), (float) powerup.getY(), (float) (powerup.getX() + powerup.getWidth()), (float) (powerup.getY() + powerup.getHeight()), scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
 
