@@ -21,8 +21,11 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.graphics.Bitmap.Config.ALPHA_8;
 
 /**
  * Created by Hunter on 2/26/2017.
@@ -33,6 +36,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     //boolean var to track if game is being played
     volatile boolean playing;
     volatile boolean dying;
+    private boolean dyingtest;
     private Thread gameThread = null;
     private int vHeight;
     private int vWidth;
@@ -44,6 +48,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Player player;
     private Pipe pipe;
     private Score scoreObj;
+
+    private int shakeX;
+    private int shakeY;
+    private Random rand;
+    private int shakeRotation;
 
     private final static int FPS = 1000 / 60;
     private long beginTime;
@@ -65,7 +74,9 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private Paint fadePaint;
     private Typeface typeface;
 
+    private Bitmap scoreBit;
     private Canvas canvas;
+    private Canvas canvas2;
     private SurfaceHolder surfaceHolder;
     private Background background;
 
@@ -129,6 +140,14 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         soundManager = new SoundManager(this);
         soundManager.setAllPlayers();
 
+        shakeX = 0;
+        shakeY = 0;
+        shakeRotation = 0;
+        rand = new Random();
+        dyingtest = false;
+
+        scoreBit = Bitmap.createBitmap(vWidth, vHeight, Bitmap.Config.ALPHA_8);
+        canvas2 = new Canvas(scoreBit);
 
 
     }
@@ -171,10 +190,12 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         }
 
         while (dying ) {
+
             animateDeath();
             if(deathFrame >= 39) {
                 dying = false;
             }
+
         }
 
     }
@@ -195,8 +216,17 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             //lock the canvas
             canvas = surfaceHolder.lockCanvas();
             //drawing a background color on canvas
-            canvas.drawColor(Color.WHITE);
+
+
+            canvas.drawColor(Color.BLACK);
             try {
+
+                if(dyingtest) {
+                    canvas.scale(1.03f, 1.03f, vWidth / 2, vHeight / 2);
+                    canvas.translate(shakeX, shakeY);
+                    canvas.rotate(shakeRotation);
+                }
+
                 if(background.getBackgroundBitmap() != null) {
 
                     canvas.drawBitmap(
@@ -226,7 +256,6 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         player.getY(),
                         paint
                 );
-                //canvas.drawBitmap(expSprite, 200, 200, paint );
                 //draw the top pipe
                 canvas.drawBitmap(
                         pipe.getAboveBitmap(),
@@ -250,6 +279,17 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                         paint
                 );
 
+                if(dyingtest) {
+                    canvas.drawBitmap(player.getExpSprite(), player.getSrc(), player.getDst(), paint );
+                }
+
+                //Counteract Screenshake
+//                if(dyingtest) {
+//                    canvas.scale(.97f, .97f, vWidth / 2, vHeight / 2);
+//                    canvas.translate(-shakeX, -shakeY);
+//                    canvas.rotate(-shakeRotation);
+//                }
+
                 //Current Score
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
 
@@ -257,9 +297,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
                 canvas.drawText("DANGER!", vWidth / 2, vHeight/3, fadePaint);
 
-                if(dying) {
-                    canvas.drawBitmap(player.getExpSprite(), player.getSrc(), player.getDst(), paint );
-                }
+
 
 
             } catch (Exception e) {
@@ -268,6 +306,11 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
             //unlock the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
+
+
+
+
+
         }
 
 
@@ -359,6 +402,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
             playing = true;
             firstFrame = true;
             dying = false;
+            dyingtest = false;
             player.setSpriteRow(0);
             highScore = scoreObj.retrieveHighScore();
             gameThread = new Thread(this);
@@ -373,6 +417,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     public void animateDeath() {
         player.updateSpriteSheet();
+        shakeScreen();
         draw();
         deathFrame++;
         try {
@@ -380,6 +425,18 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         } catch (InterruptedException e) {
             e.getCause();
         }
+
+
+    }
+
+    public void shakeScreen() {
+
+        if(deathFrame < 20) {
+            shakeX = (rand.nextInt(vWidth / 36) - (vWidth / 72));
+            shakeY = (rand.nextInt(vWidth / 36) - (vWidth / 72));
+            shakeRotation = (rand.nextInt(2) - 1);
+        }
+
 
 
     }
@@ -509,5 +566,13 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     public SoundManager getSoundManager() {
         return soundManager;
+    }
+
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    public void setDyingtest(boolean dyingtest) {
+        this.dyingtest = dyingtest;
     }
 }

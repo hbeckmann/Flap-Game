@@ -135,6 +135,8 @@ public class Player {
         this.jumping = false;
         this.velocity = -(vHeight / 100);
         y = (vHeight / 2) - 168;
+        src = new Rect(0, 0, 100, 100);
+        dst = null;
 
     }
 

@@ -39,6 +39,7 @@ public class HitDetector {
             gv.setPlaying(false);
             gv.setFirstFrame(false);
             gv.setDying(true);
+            gv.setDyingtest(true);
             gv.getFadePaint().setAlpha(0);
             gv.setDeathFrame(0);
             gv.getSoundManager().restartDeathMediaPlayer();
@@ -54,6 +55,7 @@ public class HitDetector {
             gv.setPlaying(false);
             gv.setFirstFrame(false);
             gv.setDying(true);
+            gv.setDyingtest(true);
             gv.getFadePaint().setAlpha(0);
             gv.setDeathFrame(0);
             gv.getSoundManager().restartDeathMediaPlayer();
