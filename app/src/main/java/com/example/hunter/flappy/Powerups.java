@@ -26,6 +26,7 @@ public class Powerups {
     private int vHeight;
     private Random rand;
     private Boolean powerupAppeared;
+    private Boolean poweringUp;
     private Bitmap bitmap;
 
 
@@ -38,6 +39,7 @@ public class Powerups {
         this.player = player;
         this.pipe = pipe;
         this.powerupAppeared = true;
+        this.poweringUp = false;
         rand = new Random();
         powerupList = new ArrayList<Powerup>();
         powerupList.add(new Powerup("Anti-Gravity", new ReverseGravity()));
@@ -56,6 +58,9 @@ public class Powerups {
     }
 
     public void startPowerupEffect() {
+
+        powerupAppeared = false;
+        this.y = 0 - this.height - 100;
 
     }
 
@@ -123,6 +128,14 @@ public class Powerups {
 
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    public Boolean getPoweringUp() {
+        return poweringUp;
+    }
+
+    public void setPoweringUp(Boolean poweringUp) {
+        this.poweringUp = poweringUp;
     }
 
     interface Callback {

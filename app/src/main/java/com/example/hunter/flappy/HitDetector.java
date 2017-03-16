@@ -89,6 +89,8 @@ public class HitDetector {
         if (topCollision && leftCollision) {
 
             //Log.d("POWERING UP   :", "ANTIGRAVITY ACTIVATED!!");
+            gv.getPowerup().setPoweringUp(true);
+            gv.getPowerup().startPowerupEffect();
             //Powerup Collected
 
         }

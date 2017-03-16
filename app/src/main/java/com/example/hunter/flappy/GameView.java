@@ -431,9 +431,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
 
     public void shakeScreen() {
 
-        if(deathFrame < 20) {
-            shakeX = (rand.nextInt(vWidth / 36) - (vWidth / 72));
-            shakeY = (rand.nextInt(vWidth / 36) - (vWidth / 72));
+//        if(deathFrame < 20) {
+//            shakeX = (rand.nextInt(vWidth / 36) - (vWidth / 72));
+//            shakeY = (rand.nextInt(vWidth / 36) - (vWidth / 72));
+//            shakeRotation = (rand.nextInt(2) - 1);
+//        }
+
+        if(deathFrame < 10) {
+            shakeX = (rand.nextInt(vWidth / 72) - (vWidth / 144));
+            shakeY = (rand.nextInt(vWidth / 72) - (vWidth / 144));
             shakeRotation = (rand.nextInt(2) - 1);
         }
 
