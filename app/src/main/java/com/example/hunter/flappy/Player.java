@@ -3,6 +3,7 @@ package com.example.hunter.flappy;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.provider.Settings;
 
@@ -102,7 +103,6 @@ public class Player {
                 currentSprite += 1;
                 rawImage = sprites[currentSprite];
                 bitmap = Bitmap.createScaledBitmap(rawImage, height, width, true);
-
             }
 
         } else {

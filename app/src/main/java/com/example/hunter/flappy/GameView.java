@@ -55,8 +55,13 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
     private int shakeRotation;
 
     private final static int FPS = 1000 / 60;
+    private int actualFPS;
+    private int incFPS;
     private long beginTime;
     private int framesSkipped;
+    private long frameCounter;
+    private long totalRunTime;
+
     private long timeDiff;
     private int sleepTime;
     private int fadeCounter;
@@ -98,7 +103,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         pipe = new Pipe(context, viewWidth, viewHeight);
         scoreObj = new Score(context);
         highScore = scoreObj.retrieveHighScore();
-
+        actualFPS = 0;
 
 
         paint = new Paint();
@@ -149,6 +154,8 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
         scoreBit = Bitmap.createBitmap(vWidth, vHeight, Bitmap.Config.ALPHA_8);
         canvas2 = new Canvas(scoreBit);
 
+        totalRunTime = System.currentTimeMillis();
+        frameCounter = System.currentTimeMillis();
 
     }
 
@@ -166,7 +173,15 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 //control
                 control();
 
+                incFPS += 1;
                 timeDiff = System.currentTimeMillis() - beginTime;
+                frameCounter = System.currentTimeMillis();
+
+                if(frameCounter - totalRunTime >= 1000 ) {
+                    actualFPS = incFPS;
+                    incFPS = 0;
+                    totalRunTime = System.currentTimeMillis();
+                }
 
                 sleepTime = (int) (FPS - timeDiff);
 
@@ -294,6 +309,7 @@ public class GameView extends SurfaceView implements Runnable, View.OnTouchListe
                 canvas.drawText(Integer.toString(currentScore), vWidth / 2, vHeight/8, scorePaint);
 
                 canvas.drawText("High Score: " + Integer.toString(highScore), vWidth * .6f, vHeight * .9f , hscorePaint);
+                canvas.drawText("FPS: " + Integer.toString(actualFPS), vWidth * .2f, vHeight * .2f , hscorePaint);
 
                 canvas.drawText("DANGER!", vWidth / 2, vHeight/3, fadePaint);
 
